@@ -37,7 +37,7 @@ please ignore if these steps are already completed
 To run the test please run the below command
 
 ```bash
-npx ts-node src/<>
+npx ts-node src/Main.ts
 ```
 
 the above command will run the test on a chromium browser.

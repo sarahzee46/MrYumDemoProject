@@ -102,28 +102,51 @@ export async function assertCart (page: playwright.Page){
     await page.waitForSelector("text=Table number")
     const tableNumberValue = await page.$eval("text=Table number", el => el.textContent.trim());
     assert (tableNumberValue.toLowerCase() === "table number "+constants.tableNumber);
+    await console.log("assertion for table number completed.");
     
     const totalCostValue = await page.$eval("text="+constants.totalCost, el => el.textContent.trim());
     assert ( "-" +constants.totalCost ===  totalCostValue);
+    await console.log("assertion for total cost completed.");
 
     const discountValue = await page.$eval("text="+constants.discount, el => el.textContent.trim());
     assert ( "-" + constants.discount === discountValue);
+    await console.log("assertion for discount value completed.");
 
     const product1Value = await page.$eval("text="+constants.product1DisplayName, el => el.textContent.trim());
     assert ( constants.product1DisplayName.toLowerCase() === product1Value.toLowerCase());
+    await console.log("assertion for product1 value completed.");
 
     const product2Value = await page.$eval("text="+constants.product2DisplayName, el => el.textContent.trim());
     assert ( constants.product2DisplayName.toLowerCase() === product2Value.toLowerCase());
+    await console.log("assertions for product2 value completed.");
 
     const product3Value = await page.$eval("text="+constants.product3DisplayName, el => el.textContent.trim());
-    console.log ( constants.product3DisplayName.toLowerCase() +"-"+ product3Value.toLowerCase());
-    assert (constants.product3DisplayName.toLowerCase() === product3Value.toLowerCase() )
+    assert (constants.product3DisplayName.toLowerCase() === product3Value.toLowerCase() );
+    await console.log("assertions for product3 value completed.");
 
     const product1ModValue = await page.$eval("text="+constants.product1Mod, el => el.textContent.trim());
-    console.log ( constants.product1Mod.toLowerCase() +"-"+ product1ModValue.toLowerCase());
-    assert (constants.product1Mod.toLowerCase() === product1ModValue.toLowerCase().replace("1x ","") )
-
-
+    assert (constants.product1Mod.toLowerCase() === product1ModValue.toLowerCase().replace("1x ","") );
+    await console.log("assertions for product1 mod value completed.");
+    
+    const product1CounttValue = await page.$eval('text='+constants.product1DisplayName, el =>  el.parentElement.nextElementSibling.firstElementChild.firstElementChild.nextElementSibling.textContent);
+    assert (constants.product1Count.toString() === product1CounttValue);
+    await console.log("assertions for product1 count value completed.");
+    const product2CountValue = await page.$eval('text='+constants.product2DisplayName, el =>  el.parentElement.nextElementSibling.firstElementChild.firstElementChild.nextElementSibling.textContent);
+    assert (constants.product2Count.toString() === product2CountValue);
+    await console.log("assertions for product2 count value completed.");
+    const product3CountValue = await page.$eval('text='+constants.product3DisplayName, el =>  el.parentElement.nextElementSibling.firstElementChild.firstElementChild.nextElementSibling.textContent);
+    assert (constants.product3Count.toString() === product3CountValue);
+    await console.log("assertions for product3 count value completed.");
+    const product1CostValue = await page.$eval('text='+constants.product1DisplayName, el =>  el.parentElement.nextElementSibling.firstElementChild.nextElementSibling.textContent);
+    assert (constants.product1Cost === product1CostValue);
+    await console.log("assertions for product1 cost value completed.");
+    const product2CostValue = await page.$eval('text='+constants.product2DisplayName, el =>  el.parentElement.nextElementSibling.firstElementChild.nextElementSibling.textContent);
+    assert (constants.product2Cost === product2CostValue);
+    await console.log("assertions for product2 cost value completed.");
+    const product3CostValue = await page.$eval('text='+constants.product3DisplayName, el =>  el.parentElement.nextElementSibling.firstElementChild.nextElementSibling.textContent);
+    assert (constants.product3Cost === product3CostValue);
+    await console.log("assertions for product3 cost value completed.")
 }
+
 
 
