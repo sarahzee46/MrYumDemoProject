@@ -37,7 +37,7 @@ please ignore if these steps are already completed
 To run the test please run the below command
 
 ```bash
-npx ts-node src/Main.ts
+npx ts-node src/DineInPathTest.ts
 ```
 
 the above command will run the test on a chromium browser.
@@ -47,3 +47,7 @@ Below functionalities are being performed.
 * adding items to cart
 * assertion on cart
 * checkout with existing user
+
+## Output
+
+A sample video output is available on the output folder

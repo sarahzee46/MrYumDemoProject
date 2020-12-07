@@ -10,17 +10,27 @@ export async function verifyExistingCustomer(page:playwright.Page) {
     2. processes the payment
     */
 
-    await page.click('[aria-label="'+constants.phoneNumberBoxSearch+'"]'); 
-    await page.fill('input[type="'+constants.phoneNumberBox+'"]',constants.phoneNumber);
-    await page.click("text="+constants.pinCodeBoxSearch);
-    await page.click('[aria-label="'+constants.pinCodeBoxSearchText+'"]'); 
-    await page.fill('input[type="'+constants.pinCodeBox+'"]',constants.pinCode);
-    await page.waitForSelector("text="+constants.payNowButton);
+    const phoneNumberBoxSearch = "Please enter a phone number without the country dial code.";
+    const phoneNumberBox = "text";
+    const phoneNumber = "400000000";
+    const pinCodeBoxSearch = "SEND SMS CODE";
+    const pinCodeBoxSearchText = "Please enter your pin code";
+    const pinCodeBox = "text";
+    const pinCode = "3066";
+    const payNowButton = "PAY NOW";
+    const confirmation = 'Thanks! How was your experience?';
 
-    await page.click("text="+constants.payNowButton);
-    await page.waitForSelector("text="+constants.confirmation);
+    await page.click('[aria-label="'+phoneNumberBoxSearch+'"]'); 
+    await page.fill('input[type="'+phoneNumberBox+'"]',phoneNumber);
+    await page.click("text="+pinCodeBoxSearch);
+    await page.click('[aria-label="'+pinCodeBoxSearchText+'"]'); 
+    await page.fill('input[type="'+pinCodeBox+'"]',pinCode);
+    await page.waitForSelector("text="+payNowButton);
 
-    const value = await page.$eval("text="+constants.confirmation, el => el.textContent);
+    await page.click("text="+payNowButton);
+    await page.waitForSelector("text="+confirmation);
+
+    const value = await page.$eval("text="+confirmation, el => el.textContent);
     assert(value === 'Thanks! How was your experience?');
     
     return page;
@@ -33,6 +43,11 @@ export async function addToCart(page:playwright.Page, productName:string, number
     3. increases the quantity of desired product
 
     */
+
+   const addToCartButton = "Add to cart";
+   const increaseQuantity = "Add one";
+   
+
      
     await page.waitForSelector('a[href="'+constants.listPage+'/'+productName+'"]');
     await page.click('a[href="'+constants.listPage+'/'+productName+'"]');
@@ -42,32 +57,37 @@ export async function addToCart(page:playwright.Page, productName:string, number
     }
    
     if (numberofProducts > 1){        
-        await page.waitForSelector('[aria-label="'+constants.increaseQuantity+'"]');
+        await page.waitForSelector('[aria-label="'+increaseQuantity+'"]');
         //added this manual timeout because the page was not loading completely and adding additional item was getting impacted
-        await page.waitForTimeout(3000);
+        await page.waitForTimeout(constants.lowerTimeoutLimit);
         
         for (let i = 1; i < numberofProducts; i++) {
             
-            await page.click('[aria-label="'+constants.increaseQuantity+'"]');
+            await page.click('[aria-label="'+increaseQuantity+'"]');
         }
     }
     
-    await page.waitForSelector("text="+constants.addToCartButton);
-    await page.click("text="+constants.addToCartButton);
+    await page.waitForSelector("text="+addToCartButton);
+    await page.click("text="+addToCartButton);
     return page;
 }
 
-export async function dineInPath (page: playwright.Page){
+export async function dineInPath (page: playwright.Page, tableNumber: string){
     /*
     This function performs the following actions
     1. confirms the table number
     2. navigates to the dine-in menu
     */
 
-        await page.click("text="+constants.viewDineinMenu);
-        await page.click('input[name='+constants.tableNumberBox+']');        
-        await page.keyboard.type(constants.tableNumber);
-        await page.click("text="+constants.confirmButton);            
+   const viewDineinMenu = "View Dine in Menu";
+   const tableNumberBox = "tableNumber";
+   const confirmButton = "Confirm";
+   
+
+        await page.click("text="+viewDineinMenu);
+        await page.click('input[name='+tableNumberBox+']');        
+        await page.keyboard.type(tableNumber);
+        await page.click("text="+confirmButton);            
         await page.waitForSelector('a[href="' + constants.listPage + '"]');
         
         await page.click('a[href="' + constants.listPage + '"]');
@@ -80,10 +100,15 @@ export async function checkoutOrder(page: playwright.Page){
     This function performs the below action:
     1.  performs the checkout for the selected items
     */ 
-    await page.click("text="+constants.checkoutButton);
-    await page.waitForSelector("text="+constants.addTipAndPay);
-    await page.waitForTimeout(3000);
-    await page.click("text="+constants.addTipAndPay);
+
+    
+    const checkoutButton = "CHECKOUT";
+    const addTipAndPay = "ADD TIP AND PAY";
+
+    await page.click("text="+checkoutButton);
+    await page.waitForSelector("text="+addTipAndPay);
+    await page.waitForTimeout(constants.lowerTimeoutLimit);
+    await page.click("text="+addTipAndPay);
     return page;
 }
 
@@ -97,54 +122,55 @@ export async function assertCart (page: playwright.Page){
     */
 
     //waiting for the cart to load
-    await page.waitForTimeout(4000)
+    await page.waitForTimeout(constants.upperTimeoutLimit)
 
     await page.waitForSelector("text=Table number")
     const tableNumberValue = await page.$eval("text=Table number", el => el.textContent.trim());
-    assert (tableNumberValue.toLowerCase() === "table number "+constants.tableNumber);
+    assert (tableNumberValue === "Table number "+constants.tableNumber);
     await console.log("assertion for table number completed.");
     
     const totalCostValue = await page.$eval("text="+constants.totalCost, el => el.textContent.trim());
-    assert ( "-" +constants.totalCost ===  totalCostValue);
+    assert ( totalCostValue === "-" +constants.totalCost );
     await console.log("assertion for total cost completed.");
 
     const discountValue = await page.$eval("text="+constants.discount, el => el.textContent.trim());
-    assert ( "-" + constants.discount === discountValue);
+    assert (discountValue === "-" + constants.discount );
     await console.log("assertion for discount value completed.");
 
     const product1Value = await page.$eval("text="+constants.product1DisplayName, el => el.textContent.trim());
-    assert ( constants.product1DisplayName.toLowerCase() === product1Value.toLowerCase());
+    assert ( product1Value === constants.product1DisplayName );
     await console.log("assertion for product1 value completed.");
 
     const product2Value = await page.$eval("text="+constants.product2DisplayName, el => el.textContent.trim());
-    assert ( constants.product2DisplayName.toLowerCase() === product2Value.toLowerCase());
+    assert ( product2Value === constants.product2DisplayName );
     await console.log("assertions for product2 value completed.");
 
     const product3Value = await page.$eval("text="+constants.product3DisplayName, el => el.textContent.trim());
-    assert (constants.product3DisplayName.toLowerCase() === product3Value.toLowerCase() );
+    assert (product3Value === constants.product3DisplayName );
     await console.log("assertions for product3 value completed.");
 
     const product1ModValue = await page.$eval("text="+constants.product1Mod, el => el.textContent.trim());
-    assert (constants.product1Mod.toLowerCase() === product1ModValue.toLowerCase().replace("1x ","") );
+    assert (product1ModValue === constants.product1ModDisplayName );
     await console.log("assertions for product1 mod value completed.");
     
+    
     const product1CounttValue = await page.$eval('text='+constants.product1DisplayName, el =>  el.parentElement.nextElementSibling.firstElementChild.firstElementChild.nextElementSibling.textContent);
-    assert (constants.product1Count.toString() === product1CounttValue);
+    assert (product1CounttValue === constants.product1Count.toString());
     await console.log("assertions for product1 count value completed.");
     const product2CountValue = await page.$eval('text='+constants.product2DisplayName, el =>  el.parentElement.nextElementSibling.firstElementChild.firstElementChild.nextElementSibling.textContent);
-    assert (constants.product2Count.toString() === product2CountValue);
+    assert (product2CountValue === constants.product2Count.toString());
     await console.log("assertions for product2 count value completed.");
     const product3CountValue = await page.$eval('text='+constants.product3DisplayName, el =>  el.parentElement.nextElementSibling.firstElementChild.firstElementChild.nextElementSibling.textContent);
-    assert (constants.product3Count.toString() === product3CountValue);
+    assert (product3CountValue === constants.product3Count.toString());
     await console.log("assertions for product3 count value completed.");
     const product1CostValue = await page.$eval('text='+constants.product1DisplayName, el =>  el.parentElement.nextElementSibling.firstElementChild.nextElementSibling.textContent);
-    assert (constants.product1Cost === product1CostValue);
+    assert ( product1CostValue === constants.product1Cost );
     await console.log("assertions for product1 cost value completed.");
     const product2CostValue = await page.$eval('text='+constants.product2DisplayName, el =>  el.parentElement.nextElementSibling.firstElementChild.nextElementSibling.textContent);
-    assert (constants.product2Cost === product2CostValue);
+    assert (product2CostValue === constants.product2Cost);
     await console.log("assertions for product2 cost value completed.");
     const product3CostValue = await page.$eval('text='+constants.product3DisplayName, el =>  el.parentElement.nextElementSibling.firstElementChild.nextElementSibling.textContent);
-    assert (constants.product3Cost === product3CostValue);
+    assert (product3CostValue === constants.product3Cost);
     await console.log("assertions for product3 cost value completed.")
 }
 
